@@ -4,27 +4,24 @@ import path from "path";
 
 const PORT = 3000;
 
+const serveFile = async (res, filePath, contentType) => {
+  try {
+    const data = await readFile(filePath);
+    res.writeHead(200, { "Content-Type": contentType });
+    res.end(data);
+  } catch (error) {
+    res.writeHead(404, { "Content-Type": "content/plain" });
+    res.end("404 page not found.");
+  }
+};
+
 const server = createServer(async (req, res) => {
   if (req.method == "GET") {
     if (req.url == "/") {
-      try {
-        const data = await readFile(path.join("public", "index.html"));
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(data);
-      } catch (error) {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.end("404 page not found.");
-      }
+      return serveFile(res, path.join("public", "index.html"),"text/html");
     } else if (req.method == "GET") {
       if (req.url == "/style.css") {
-        try {
-          const data = await readFile(path.join("public", "style.css"));
-          res.writeHead(200, { "Content-Type": "text/css" });
-          res.end(data);
-        } catch (error) {
-          res.writeHead(404, { "Content-Type": "text/css" });
-          res.end("404 page not found.");
-        }
+        return serveFile(res, path.join("public", "style.css"), "text/css");
       }
     }
   }
