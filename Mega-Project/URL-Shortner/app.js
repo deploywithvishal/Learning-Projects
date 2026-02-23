@@ -1,12 +1,15 @@
-import { readFile } from "fs/promises";
+import { readFile, mkdir } from "fs/promises";
 import { createServer } from "http";
 import crypto from "crypto";
 import path from "path";
-import { json } from "stream/consumers";
 import { writeFile } from "fs/promises";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const PORT = 3000;
-const DATA_FILE = path.join("data", "links.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const DATA_FILE = path.join(__dirname, "data", "links.json");
 
 const serveFile = async (res, filePath, contentType) => {
   try {
@@ -22,9 +25,18 @@ const serveFile = async (res, filePath, contentType) => {
 const loadLinks = async () => {
   try {
     const data = await readFile(DATA_FILE, "utf-8");
-    return json.parse(data);
+
+    if (!data) return {};
+
+    try {
+      return JSON.parse(data);
+    } catch {
+      await writeFile(DATA_FILE, JSON.stringify({}));
+      return {};
+    }
   } catch (error) {
     if (error.code === "ENOENT") {
+      await mkdir(path.dirname(DATA_FILE), { recursive: true });
       await writeFile(DATA_FILE, JSON.stringify({}));
       return {};
     }
@@ -37,28 +49,74 @@ const saveLinks = async (links) => {
 };
 
 const server = createServer(async (req, res) => {
-  if (req.method == "GET") {
-    if (req.url == "/") {
-      return serveFile(res, path.join("public", "index.html"), "text/html");
-    } else if (req.url == "/style.css") {
-      return serveFile(res, path.join("public", "style.css"), "text/css");
+  if (req.method === "GET") {
+    const links = await loadLinks();
+
+    if (req.url === "/") {
+      return serveFile(
+        res,
+        path.join(__dirname, "public", "index.html"),
+        "text/html",
+      );
     }
+
+    if (req.url === "/style.css") {
+      return serveFile(
+        res,
+        path.join(__dirname, "public", "style.css"),
+        "text/css",
+      );
+    }
+
+    const shortCode = req.url.slice(1);
+
+    if (links[shortCode]) {
+      res.writeHead(302, {
+        Location: links[shortCode],
+      });
+      return res.end();
+    }
+
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    return res.end("Short URL not found");
   }
 
   if (req.method === "POST" && req.url === "/shorten") {
-    const links = await loadLinks();
+    let links = {};
+    try {
+      links = await loadLinks();
+    } catch (err) {
+      res.writeHead(500);
+      return res.end("Server error loading links");
+    }
 
-    const body = "";
-    req.on("data", (chunk) => {
-      body = body + chunk;
-    });
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
     req.on("end", async () => {
-      console.log(body);
-      const { url, shortCode } = JSON.parse(body);
+      if (!body) {
+        res.writeHead(400);
+        return res.end("Empty request body");
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        res.writeHead(400);
+        return res.end("Invalid JSON");
+      }
+
+      const { url, shortCode } = parsed;
 
       if (!url) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         return res.end("URL is required");
+      }
+      try {
+        new URL(url);
+      } catch {
+        res.writeHead(400);
+        return res.end("Invalid URL format");
       }
 
       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
@@ -78,5 +136,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost: ${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
