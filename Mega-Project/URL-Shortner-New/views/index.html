@@ -11,7 +11,7 @@
     <div class="container">
       <h1>URL Shortener</h1>
 
-      <form method="post" action="/">
+      <form action="/" method="post">
         <div>
           <label for="url">Enter URL: </label>
           <input type="url" name="url" id="url" required />
@@ -25,12 +25,8 @@
 
       <h2>Shortened URLs</h2>
       <ul>
-        {{ shortened_urls }}
+        {{shortened_urls}}
       </ul>
     </div>
-
-    
-
-
   </body>
 </html>
