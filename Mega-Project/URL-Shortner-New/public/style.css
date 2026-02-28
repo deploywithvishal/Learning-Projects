@@ -1,0 +1,83 @@
+/* Reset default margin */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Full screen center */
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Main container box */
+.container {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Headings */
+.container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.container h2 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+/* Form spacing */
+form div {
+    margin-bottom: 15px;
+}
+
+/* Input fields */
+input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+input:focus {
+    border-color: #4e73df;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background: #4e73df;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #2e59d9;
+}
+
+/* URL list */
+#shortened-urls {
+    list-style: none;
+}
+
+#shortened-urls li {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+
