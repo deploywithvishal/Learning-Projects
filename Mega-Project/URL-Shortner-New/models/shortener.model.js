@@ -1,6 +1,10 @@
 import path, { dirname } from "path";
 import { readFile, mkdir, writeFile } from "fs/promises";
+import { fileURLToPath } from "url";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const DATA_FILE = path.join(__dirname, "../data", "links.json");
 
 export const loadLinks = async () => {
@@ -25,6 +29,6 @@ export const loadLinks = async () => {
   }
 };
 
-const saveLinks = async (links) => {
+export const saveLinks = async (links) => {
   await writeFile(DATA_FILE, JSON.stringify(links));
 };
