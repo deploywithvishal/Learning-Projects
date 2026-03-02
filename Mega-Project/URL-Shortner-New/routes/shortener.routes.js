@@ -1,51 +1,14 @@
 import crypto from "crypto";
-import path, { dirname } from "path";
-import { readFile, mkdir, writeFile } from "fs/promises";
-import { fileURLToPath } from "url";
 
+import { fileURLToPath } from "url";
+import {postURLShortener} from "../controllers/postshortner.contoller.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const DATA_FILE = path.join(__dirname, "../data", "links.json");
-import {Router} from "express";
+import { Router } from "express";
 
 const router = Router();
 
-
-const loadLinks = async () => {
-  try {
-    const data = await readFile(DATA_FILE, "utf-8");
-
-    if (!data) return {};
-
-    try {
-      return JSON.parse(data);
-    } catch {
-      await writeFile(DATA_FILE, JSON.stringify({}));
-      return {};
-    }
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      await mkdir(path.dirname(DATA_FILE), { recursive: true });
-      await writeFile(DATA_FILE, JSON.stringify({}));
-      return {};
-    }
-    throw error;
-  }
-};
-
-const saveLinks = async (links) => {
-  await writeFile(DATA_FILE, JSON.stringify(links));
-};
-
-router.get("/report", (req,res)=>{
-  const student = {
-    name:"Vishal",
-    grade:"PG",
-    subject:"Math"
-  };
-  return res.render("report",{student})
-})
 
 router.get("/", async (req, res) => {
   try {
@@ -68,23 +31,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  try {
-    const { url, shortCode } = req.body;
-    const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
-    const links = await loadLinks();
-    if (links[finalShortCode]) {
-      return res
-        .status(400)
-        .send("Short code already exists. Please choose another.");
-    }
-    links[finalShortCode] = url;
-    await saveLinks(links);
-    return res.redirect("/");
-  } catch (error) {
-    console.log("Error 2: ", error);
-  }
-});
+
+router.post("/", postURLShortener(loadLinks, saveLinks));
 
 router.get("/:shortCode", async (req, res) => {
   try {
@@ -98,6 +46,5 @@ router.get("/:shortCode", async (req, res) => {
 });
 
 // export default router;
-
 
 export const shortenedRoutes = router;

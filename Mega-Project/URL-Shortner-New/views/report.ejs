@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="report.css">
 </head>
+
 <body>
+    <%- include('header')%>
+
+    <section class="report-section">
     <h1>Student Report Card</h1>
-    <p>Name: <%=   student.name %></p>
-    <p>Grade: <%=   student.grade %></p>
-    <p>Subject: <%=   student.subject %></p>
+    <ul class="student-list">
+        <% students.forEach((stud) => { %>
+            <li class="student-card">
+                <p><strong>Name:</strong> <%= stud.name %></p>
+                <p><strong>Grade:</strong> <%= stud.grade %></p>
+                <p><strong>Subject:</strong> <%= stud.subject %></p>
+            </li>
+        <% }) %>
+    </ul>
+</section>
+
+
 </body>
+
 </html>
