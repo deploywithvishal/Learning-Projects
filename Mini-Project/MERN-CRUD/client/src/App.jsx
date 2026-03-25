@@ -1,5 +1,14 @@
 import React from "react";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
 
 export const App = () => {
-  return <h1>This is app Component. </h1>;
+  return (
+    <>
+      <Navbar />
+      <Home />
+    </>
+  );
 };
+
+export default App;
